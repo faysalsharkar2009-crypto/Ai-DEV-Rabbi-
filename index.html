@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI File Unlocker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='10135149' data-sdk='show_10135149'></script>
     <style>
         * {
@@ -51,7 +49,6 @@
             padding: 15px;
         }
 
-        /* Header Styles - Clean and Bright */
         header {
             text-align: center;
             margin-bottom: 20px;
@@ -101,6 +98,13 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .logo i {
@@ -170,7 +174,6 @@
             color: #1877F2;
         }
 
-        /* Search Box - Clean Design */
         .search-box {
             margin-bottom: 25px;
             position: relative;
@@ -211,7 +214,6 @@
             z-index: 2;
         }
 
-        /* Files Grid */
         .files-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -352,7 +354,6 @@
             box-shadow: none;
         }
 
-        /* Loading Spinner */
         .loading {
             display: flex;
             justify-content: center;
@@ -375,7 +376,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Ad Modal */
         .ad-modal {
             display: none;
             position: fixed;
@@ -441,7 +441,6 @@
             flex: 1;
         }
 
-        /* Notification */
         .notification {
             position: fixed;
             top: 20px;
@@ -529,7 +528,6 @@
             border-top: 1px solid var(--medium-gray);
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .files-grid {
                 grid-template-columns: 1fr;
@@ -565,35 +563,52 @@
             }
         }
 
-        /* Ad Banner Styles */
-        .ad-banner {
-            display: flex;
-            justify-content: center;
+        .special-notification {
+            background: linear-gradient(135deg, #ff006e, #e0005e);
+        }
+
+        .requirement-list {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
             margin: 15px 0;
-            width: 100%;
+            text-align: left;
+        }
+
+        .requirement-list li {
+            margin-bottom: 8px;
+            color: #856404;
+        }
+
+        .time-requirement {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .special-ad-image {
+            width: 411px;
+            height: 200px;
+            max-width: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <!-- Ad Banner - Top -->
-    <div class="ad-banner">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '00d25c3c353995d46d51bf532af984d3',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/00d25c3c353995d46d51bf532af984d3/invoke.js"></script>
-    </div>
-
     <div class="container">
         <header>
             <div class="header-content">
                 <div class="logo-section">
-                    <div class="logo">
+                    <div class="logo" id="siteLogo">
                         <i class="fas fa-robot"></i>
                     </div>
                     <div class="title-section">
@@ -602,7 +617,6 @@
                     </div>
                 </div>
                 <div class="social-stats" id="socialStats">
-                    <!-- Social media icons will be loaded here -->
                 </div>
             </div>
         </header>
@@ -623,21 +637,6 @@
         </footer>
     </div>
 
-    <!-- Ad Banner - Bottom -->
-    <div class="ad-banner">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '00d25c3c353995d46d51bf532af984d3',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/00d25c3c353995d46d51bf532af984d3/invoke.js"></script>
-    </div>
-
-    <!-- Ad Modal -->
     <div class="ad-modal" id="adModal">
         <div class="ad-content">
             <div class="ad-header">Watch Ad to Unlock File</div>
@@ -657,7 +656,6 @@
         </div>
     </div>
 
-    <!-- Notification -->
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <div class="notification-content">
@@ -667,7 +665,6 @@
     </div>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBa9Rj5_qNeysHtW06KzuRWC-YrFROu8eA",
             authDomain: "my-web-957ec.firebaseapp.com",
@@ -678,11 +675,9 @@
             measurementId: "G-QSB2X16RTC"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // DOM Elements
         const filesContainer = document.getElementById('filesContainer');
         const searchInput = document.getElementById('searchInput');
         const adModal = document.getElementById('adModal');
@@ -694,27 +689,25 @@
         const siteTitle = document.getElementById('siteTitle');
         const siteDescription = document.getElementById('siteDescription');
         const socialStats = document.getElementById('socialStats');
+        const siteLogo = document.getElementById('siteLogo');
 
-        // Current state
         let currentFile = null;
         let filesData = [];
         let userId = '';
         let socialLinks = {};
+        let specialAdNumbers = [3, 7, 10];
+        let specialAdTime = 25;
+        let specialAdNotice = "";
+        let adStartTime = 0;
+        let appSettings = {};
 
-        // Initialize the app
         function initApp() {
-            // Generate or get user ID
             userId = getUserId();
-            
-            // Load site settings
             loadSiteSettings();
-            
-            // Load files from Firebase
             loadFiles();
             setupEventListeners();
         }
 
-        // Get or create user ID
         function getUserId() {
             let id = localStorage.getItem('userId');
             if (!id) {
@@ -724,15 +717,14 @@
             return id;
         }
 
-        // Load site settings from Firebase
         function loadSiteSettings() {
             showLoading();
             
             db.collection('settings').doc('site').get().then((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
+                    appSettings = data;
                     
-                    // Update site title and description
                     if (data.title) {
                         siteTitle.textContent = data.title;
                     }
@@ -741,13 +733,29 @@
                         siteDescription.textContent = data.description;
                     }
                     
-                    // Load social links
+                    if (data.specialAdNumbers && Array.isArray(data.specialAdNumbers)) {
+                        specialAdNumbers = data.specialAdNumbers;
+                    }
+                    
+                    if (data.specialAdTime && typeof data.specialAdTime === 'number') {
+                        specialAdTime = data.specialAdTime;
+                    }
+                    
+                    if (data.specialAdNotice) {
+                        specialAdNotice = data.specialAdNotice;
+                    } else {
+                        specialAdNotice = "আপনাকে বিজ্ঞাপন দেখার পর অবশ্যই \"Continue\" বাটনে ক্লিক করতে হবে\nপরবর্তী পৃষ্ঠায় ১০-১৫ সেকেন্ড অপেক্ষা করুন\nতারপর আনলক প্রক্রিয়া সম্পূর্ণ করতে ফিরে আসুন";
+                    }
+                    
+                    if (data.logoUrl) {
+                        siteLogo.innerHTML = `<img src="${data.logoUrl}" alt="Site Logo">`;
+                    }
+                    
                     if (data.socialLinks) {
                         socialLinks = data.socialLinks;
                         renderSocialLinks();
                     }
                 } else {
-                    // Use default values
                     loadDefaultSettings();
                 }
             }).catch((error) => {
@@ -757,9 +765,7 @@
             });
         }
 
-        // Load default settings
         function loadDefaultSettings() {
-            // Default social links
             socialLinks = {
                 youtube: { visible: true, url: 'https://youtube.com', name: 'YouTube', followers: '15K' },
                 telegram: { visible: true, url: 'https://telegram.org', name: 'Telegram', followers: '8.5K' },
@@ -767,14 +773,14 @@
                 facebook: { visible: true, url: 'https://facebook.com', name: 'Facebook', followers: '25K' }
             };
             
+            specialAdNotice = "আপনাকে বিজ্ঞাপন দেখার পর অবশ্যই \"Continue\" বাটনে ক্লিক করতে হবে\nপরবর্তী পৃষ্ঠায় ১০-১৫ সেকেন্ড অপেক্ষা করুন\nতারপর আনলক প্রক্রিয়া সম্পূর্ণ করতে ফিরে আসুন";
+            
             renderSocialLinks();
         }
 
-        // Render social links
         function renderSocialLinks() {
             socialStats.innerHTML = '';
             
-            // Create YouTube stat if visible
             if (socialLinks.youtube && socialLinks.youtube.visible) {
                 const youtubeStat = document.createElement('div');
                 youtubeStat.className = 'social-stat youtube';
@@ -785,7 +791,6 @@
                 socialStats.appendChild(youtubeStat);
             }
             
-            // Create Telegram stat if visible
             if (socialLinks.telegram && socialLinks.telegram.visible) {
                 const telegramStat = document.createElement('div');
                 telegramStat.className = 'social-stat telegram';
@@ -796,7 +801,6 @@
                 socialStats.appendChild(telegramStat);
             }
             
-            // Create TikTok stat if visible
             if (socialLinks.tiktok && socialLinks.tiktok.visible) {
                 const tiktokStat = document.createElement('div');
                 tiktokStat.className = 'social-stat tiktok';
@@ -807,7 +811,6 @@
                 socialStats.appendChild(tiktokStat);
             }
             
-            // Create Facebook stat if visible
             if (socialLinks.facebook && socialLinks.facebook.visible) {
                 const facebookStat = document.createElement('div');
                 facebookStat.className = 'social-stat facebook';
@@ -819,16 +822,11 @@
             }
         }
 
-        // Set up event listeners
         function setupEventListeners() {
-            // Search input
             searchInput.addEventListener('input', filterFiles);
-            
-            // Ad modal buttons
             closeAdBtn.addEventListener('click', closeAdModal);
         }
 
-        // Load files from Firebase
         function loadFiles() {
             showLoading();
             
@@ -840,7 +838,6 @@
                     filesData.push(fileData);
                 });
                 
-                // Load user progress for each file
                 loadUserProgress();
             }).catch((error) => {
                 console.error("Error loading files: ", error);
@@ -849,7 +846,6 @@
             });
         }
 
-        // Load user progress from Firebase
         function loadUserProgress() {
             const userRef = db.collection('users').doc(userId);
             
@@ -857,7 +853,6 @@
                 if (doc.exists) {
                     const userData = doc.data();
                     
-                    // Update files with user progress
                     filesData.forEach(file => {
                         if (userData[file.id]) {
                             file.adsWatched = userData[file.id].adsWatched || 0;
@@ -868,7 +863,6 @@
                         }
                     });
                 } else {
-                    // Initialize user data if doesn't exist
                     filesData.forEach(file => {
                         file.adsWatched = 0;
                         file.unlocked = false;
@@ -878,7 +872,6 @@
                 renderFiles(filesData);
             }).catch((error) => {
                 console.error("Error loading user progress: ", error);
-                // Set default values
                 filesData.forEach(file => {
                     file.adsWatched = 0;
                     file.unlocked = false;
@@ -887,7 +880,6 @@
             });
         }
 
-        // Show default files if Firebase fails
         function showDefaultFiles() {
             filesData = [
                 {
@@ -922,45 +914,11 @@
                     image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
                     downloadLink: "https://drive.google.com/",
                     unlocked: false
-                },
-                {
-                    id: "default4",
-                    name: "Full Stack Web Development",
-                    description: "Complete guide to becoming a full stack web developer with modern technologies.",
-                    size: "320.7 MB",
-                    adsRequired: 6,
-                    adsWatched: 0,
-                    image: "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-                    downloadLink: "https://drive.google.com/",
-                    unlocked: false
-                },
-                {
-                    id: "default5",
-                    name: "Machine Learning Fundamentals",
-                    description: "Introduction to machine learning algorithms and their practical applications.",
-                    size: "275.2 MB",
-                    adsRequired: 4,
-                    adsWatched: 0,
-                    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-                    downloadLink: "https://drive.google.com/",
-                    unlocked: false
-                },
-                {
-                    id: "default6",
-                    name: "Data Science Essentials",
-                    description: "Master data analysis, visualization, and statistical modeling techniques.",
-                    size: "189.5 MB",
-                    adsRequired: 3,
-                    adsWatched: 0,
-                    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-                    downloadLink: "https://drive.google.com/",
-                    unlocked: false
                 }
             ];
             renderFiles(filesData);
         }
 
-        // Render files to the container
         function renderFiles(files) {
             filesContainer.innerHTML = '';
 
@@ -1008,11 +966,9 @@
             });
         }
 
-        // Filter files based on search
         function filterFiles() {
             let filteredFiles = filesData;
             
-            // Filter by search
             const searchTerm = searchInput.value.toLowerCase();
             if (searchTerm) {
                 filteredFiles = filteredFiles.filter(file => 
@@ -1024,68 +980,130 @@
             renderFiles(filteredFiles);
         }
 
-        // Unlock file function
         function unlockFile(fileId) {
             const file = filesData.find(f => f.id === fileId);
             if (!file) return;
             
             currentFile = file;
-            showAdModal();
+            const currentAdCount = file.adsWatched + 1;
+            
+            const isSpecialAd = specialAdNumbers.includes(currentAdCount);
+            
+            if (isSpecialAd) {
+                showSpecialAdNotification();
+            } else {
+                showAdModal();
+            }
         }
 
-        // Show ad modal
+        function showSpecialAdNotification() {
+            const notificationModal = document.createElement('div');
+            notificationModal.className = 'ad-modal';
+            notificationModal.style.display = 'flex';
+            notificationModal.innerHTML = `
+                <div class="ad-content">
+                    <div class="ad-header special-notification">
+                        <i class="fas fa-exclamation-circle"></i> বিশেষ বিজ্ঞাপনের প্রয়োজনীয়তা
+                    </div>
+                    <div class="ad-body">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <i class="fas fa-hand-point-up" style="font-size: 40px; color: #ff006e; margin-bottom: 15px;"></i>
+                            <h3 style="margin-bottom: 10px; color: #ff006e;">গুরুত্বপূর্ণ বিজ্ঞপ্তি</h3>
+                            <p>এটি একটি <strong>বিশেষ বিজ্ঞাপন (#${currentFile.adsWatched + 1})</strong> অতিরিক্ত প্রয়োজনীয়তা সহ:</p>
+                        </div>
+                        
+                        <div class="requirement-list">
+                            <ul>
+                                ${specialAdNotice.split('\n').map(line => `<li>${line}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <img src="https://i.ibb.co/S43hxFSj/IMG-20251108-175337-484.jpg" alt="Special Ad Instructions" class="special-ad-image">
+                        
+                        <p style="font-size: 14px; color: var(--dark-gray); margin-bottom: 20px;">
+                            <i class="fas fa-info-circle"></i> এটি আমাদের সত্যিকারের ব্যবহারকারীদের যাচাই করতে এবং পরিষেবা বজায় রাখতে সহায়তা করে
+                        </p>
+                        
+                        <div class="ad-actions">
+                            <button class="btn" id="proceedToAdBtn" style="background: linear-gradient(135deg, #ff006e, #e0005e);">
+                                <i class="fas fa-play"></i> আমি বুঝেছি - বিজ্ঞাপন দেখান
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notificationModal);
+            
+            document.getElementById('proceedToAdBtn').addEventListener('click', function() {
+                document.body.removeChild(notificationModal);
+                showAdModal();
+                
+                currentFile.isSpecialAd = true;
+                currentFile.specialAdNumber = currentFile.adsWatched + 1;
+            });
+        }
+
         function showAdModal() {
+            adStartTime = Date.now();
             adModal.style.display = 'flex';
             adTimer.textContent = "Loading ad...";
+            closeAdBtn.style.display = 'none';
             
-            // Use Monetag SDK to show the ad
             if (typeof show_10135149 !== 'undefined') {
                 show_10135149().then(() => {
-                    // Ad completed successfully
                     adComplete();
                 }).catch((error) => {
-                    // Ad failed or was closed by user
                     console.error("Ad error: ", error);
                     showError("Ad was not completed. Please try again.");
                     closeAdModal();
                 });
             } else {
-                // Fallback if Monetag SDK is not available
                 showError("Ad system is not available. Please try again later.");
                 closeAdModal();
             }
         }
 
-        // Ad completed
         function adComplete() {
+            const adWatchTime = Math.floor((Date.now() - adStartTime) / 1000);
+            
+            if (currentFile.isSpecialAd && adWatchTime < specialAdTime) {
+                adTimer.innerHTML = `
+                    <div style="text-align: center; color: var(--error);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p><strong>বিজ্ঞাপন দেখার সময় খুব কম!</strong></p>
+                        <p>আপনি শুধুমাত্র <strong>${adWatchTime} সেকেন্ড</strong> দেখেছেন।</p>
+                        <p>বিশেষ বিজ্ঞাপন #${currentFile.specialAdNumber} এর জন্য আরও সময় প্রয়োজন।</p>
+                        <button class="btn" onclick="showAdModal()" style="margin-top: 10px; background: var(--error);">
+                            <i class="fas fa-redo"></i> আবার দেখুন
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
             adTimer.textContent = "Ad completed! Updating your progress...";
             closeAdBtn.style.display = 'flex';
             
-            // Update file progress
-            if (currentFile) {
-                currentFile.adsWatched++;
-                
-                if (currentFile.adsWatched >= currentFile.adsRequired) {
-                    currentFile.unlocked = true;
-                    showNotification("Success!", "File unlocked successfully! You can now download it.", "success");
-                } else {
-                    showNotification("Progress Updated!", `You need ${currentFile.adsRequired - currentFile.adsWatched} more ads to unlock this file.`, "success");
-                }
-                
-                // Save progress to Firebase
-                saveUserProgress();
-                filterFiles();
+            currentFile.adsWatched++;
+            
+            if (currentFile.adsWatched >= currentFile.adsRequired) {
+                currentFile.unlocked = true;
+                showNotification("Success!", "File unlocked successfully! You can now download it.", "success");
+            } else {
+                showNotification("Progress Updated!", `You need ${currentFile.adsRequired - currentFile.adsWatched} more ads to unlock this file.`, "success");
             }
+            
+            saveUserProgress();
+            filterFiles();
         }
 
-        // Close ad modal
         function closeAdModal() {
             adModal.style.display = 'none';
             closeAdBtn.style.display = 'none';
             currentFile = null;
         }
 
-        // Save user progress to Firebase
         function saveUserProgress() {
             if (!currentFile) return;
             
@@ -1107,13 +1125,11 @@
                 });
         }
 
-        // Show notification
         function showNotification(title, message, type = "success") {
             notification.className = `notification ${type}`;
             notificationTitle.textContent = title;
             notificationMessage.textContent = message;
             
-            // Update icon based on type
             const icon = notification.querySelector('i');
             if (type === "success") {
                 icon.className = "fas fa-check-circle";
@@ -1127,12 +1143,10 @@
             }, 4000);
         }
 
-        // Show error notification
         function showError(message) {
             showNotification("Error", message, "error");
         }
 
-        // Show loading state
         function showLoading() {
             filesContainer.innerHTML = `
                 <div class="loading">
@@ -1141,20 +1155,22 @@
             `;
         }
 
-        // Download file
         function downloadFile(fileId) {
             const file = filesData.find(f => f.id === fileId);
             if (!file) return;
             
             if (file.unlocked) {
-                // Open the Google Drive link in a new tab
                 window.open(file.downloadLink, '_blank');
+                
+                const fileRef = db.collection('files').doc(fileId);
+                fileRef.set({
+                    downloadCount: (file.downloadCount || 0) + 1
+                }, { merge: true });
             } else {
                 showError("This file is still locked. Please watch ads to unlock it.");
             }
         }
 
-        // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
